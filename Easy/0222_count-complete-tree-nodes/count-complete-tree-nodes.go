@@ -1,0 +1,76 @@
+package main
+
+import (
+	"fmt"
+	"strings"
+	"strconv"
+)
+
+
+type TreeNode struct {
+	Val int
+	Left *TreeNode
+	Right *TreeNode
+}
+
+func countNodes(root *TreeNode) int {
+	if root == nil {
+		return 0
+	}
+  return 1 + countNodes(root.Left) + countNodes(root.Right)
+}
+
+func BuildTree(data string) *TreeNode {
+	if data == "" {
+		return nil
+	}
+
+	values := strings.Split(data, ",")
+	if len(values) == 0 || values[0] == "null" {
+		return nil
+	}
+
+	val, err := strconv.Atoi(values[0])
+	if err != nil {
+		return nil
+	}
+	root := &TreeNode{Val: val}
+
+	queue := []*TreeNode{root}
+	i := 1
+
+	for len(queue) > 0 && i < len(values) {
+		node := queue[0]
+		queue = queue[1:]
+
+		if i < len(values) && values[i] != "null" {
+			if v, err := strconv.Atoi(values[i]); err == nil {
+				node.Left = &TreeNode{Val: v}
+				queue = append(queue, node.Left)
+			}
+		}
+		i++
+
+		if i < len(values) && values[i] != "null" {
+			if v, err := strconv.Atoi(values[i]); err == nil {
+				node.Right = &TreeNode{Val: v}
+				queue = append(queue, node.Right)
+			}
+		}
+		i++
+	}
+	return root
+}
+
+func main() {
+	tests := []string{
+		"1,2,3,4,5,6",
+		"1",
+		"",
+	}
+
+	for _, t := range tests {
+		tree := BuildTree(t)
+		fmt.Printf("---\ntree: [%s], countNodes: %d\n", t, countNodes(tree))
+	}
+}
